@@ -1,0 +1,22 @@
+{
+  "name": "kneg",
+  "version": "0.1.0",
+  "description": "",
+  "main": "kneg.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "anton-g",
+  "license": "MIT",
+  "preferGlobal": true,
+  "bin": {
+    "kneg": "./bin/kneg.js"
+  },
+  "dependencies": {
+    "chalk": "^1.1.1",
+    "commander": "^2.9.0",
+    "jsonfile": "^2.2.3",
+    "moment": "^2.11.2",
+    "underscore": "^1.8.3"
+  }
+}
