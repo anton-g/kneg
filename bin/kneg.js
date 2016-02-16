@@ -29,7 +29,7 @@ program
     .version('0.1.0')
     .option('-t, --task <id>', 'Select task')
     .option('-v, --verbose', 'Include completed tasks when displaying tasks.')
-    .option('-d, --deadline <deadline>', 'Set deadline for task') //TODO implement
+    .option('-d, --deadline <deadline>', 'Set deadline for task')
     .option('-a, --add <task>', 'Add new task', addTask)
     .option('-c, --complete <id>', 'Complete task', complete)
     .option('-s, --show <id>', 'Display a single task', printDetail)
@@ -71,6 +71,10 @@ function addTask(desc) {
         tasks: []
     };
 
+    if (program.deadline) {
+        newTask.deadline = parseDeadline(program.deadline);
+    }
+
     if (program.task) {
         var supertask = getTask(program.task);
         if (!supertask) {
@@ -78,7 +82,7 @@ function addTask(desc) {
             return;
         }
 
-        //TODO Add tasks to completed tasks
+        //TODO Handle add tasks to completed tasks?
         newTask.id = supertask.tasks.length + 1;
         supertask.tasks.push(newTask);
     } else {
@@ -155,10 +159,19 @@ function parseIds(input) {
 function parseDeadline(d) {
     var date = moment(d, ['YYYY-MM-DD', 'YYYY-MM-DD HH:mm'], true);
     if (date.isValid()) {
-        console.log('valid');
+        return date;
     } else {
-        var fromNow = moment().add(d, 'd');
-        console.log(fromNow.format());
+        var re = /^([0-9]+)([mhdwMy]){1}$/;
+        var test = re.exec(d);
+
+        if (test) {
+            var num = test[1];
+            var char = test[2];
+            var fromNow = moment().add(num, char);
+            return fromNow;
+        } else {
+            //Not valid
+        }
     }
 }
 
