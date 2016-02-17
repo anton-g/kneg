@@ -1,8 +1,8 @@
 {
   "name": "kneg",
   "version": "0.1.0",
-  "description": "",
-  "main": "kneg.js",
+  "description": "Simple todo list manager for the command line.",
+  "main": "./bin/kneg.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
