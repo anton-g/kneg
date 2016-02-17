@@ -26,17 +26,25 @@ try {
 }
 
 program
-    .version('0.1.0')
-    .option('-t, --task <id>', 'Select task')
+    .option('-a, --add <task>', 'Add new task.')
+    .option('-t, --task <id>', 'Show task. Combine with -a to add subtask.')
+    .option('-d, --deadline <deadline>', 'Specifiy task deadline when adding or modifying task.')
+    .option('-c, --complete <id>', 'Mark task and subtasks as completed.')
     .option('-v, --verbose', 'Include completed tasks when displaying tasks.')
-    .option('-d, --deadline <deadline>', 'Set deadline for task')
-    .option('-a, --add <task>', 'Add new task', addTask)
-    .option('-c, --complete <id>', 'Complete task', complete)
-    .option('-s, --show <id>', 'Display a single task', printDetail)
-    .option('-b, --beta <date>', 'Remove me in production', parseDeadline)
     .parse(process.argv);
 
-printAll();
+if (program.task) modifyTask(program.task);
+else if (program.add) addTask(program.add);
+else if (program.complete) complete(program.complete);
+else printAll();
+
+function modifyTask(taskId) {
+    if (program.add) {
+        addSubTask(program.add, taskId);
+    } else {
+        printDetail(taskId);
+    }
+}
 
 function complete(taskId) {
     var task = getTask(taskId);
@@ -63,32 +71,34 @@ function markAsCompleted(task) {
 }
 
 function addTask(desc) {
-    var newTask = {
-        id: NaN,
-        desc: desc,
-        completed: false,
-        addDate: new Date(),
-        tasks: []
-    };
+    var newTask = newTaskObj(desc);
 
     if (program.deadline) {
         newTask.deadline = parseDeadline(program.deadline);
     }
 
-    if (program.task) {
-        var supertask = getTask(program.task);
-        if (!supertask) {
-            console.log('No task with that id.');
-            return;
-        }
+    newTask.id = data.tasks.length + 1;
+    data.tasks.push(newTask);
 
-        //TODO Handle add tasks to completed tasks?
-        newTask.id = supertask.tasks.length + 1;
-        supertask.tasks.push(newTask);
-    } else {
-        newTask.id = data.tasks.length + 1;
-        data.tasks.push(newTask);
+    save();
+}
+
+function addSubTask(desc, supertaskId) {
+    var newTask = newTaskObj(desc);
+
+    if (program.deadline) {
+        newTask.deadline = parseDeadline(program.deadline);
     }
+    var supertask = getTask(supertaskId);
+
+    if (!supertask) {
+        console.log('No task with that id.');
+        return;
+    }
+
+    //TODO Handle add tasks to completed tasks?
+    newTask.id = supertask.tasks.length + 1;
+    supertask.tasks.push(newTask);
 
     save();
 }
@@ -181,4 +191,14 @@ function save() {
             console.log(chalk.red('Something went wrong while saving: ' + err.message));
         }
     });
+}
+
+function newTaskObj(desc) {
+    return {
+        id: null,
+        desc: desc,
+        completed: false,
+        addDate: new Date(),
+        tasks: []
+    };
 }
