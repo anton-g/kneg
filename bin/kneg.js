@@ -122,7 +122,11 @@ function printTask(t, offsetCount) {
     }
 
     if (t.completed == false) {
-        console.log(offset + t.id + ' │ ' + t.desc);
+        var output = offset + t.id + ' | ' + t.desc;
+        if (t.deadline) {
+            output += ' • ' + deadlineToString(t.deadline);
+        }
+        console.log(output);
     } else if (program.verbose) {
         console.log(offset + chalk.dim(t.id + ' │ ' + t.desc));
     }
@@ -201,4 +205,14 @@ function newTaskObj(desc) {
         addDate: new Date(),
         tasks: []
     };
+}
+
+function deadlineToString(deadline) {
+    var start = moment();
+    var end = moment(deadline);
+
+    if (end.isBefore(start))
+        return chalk.red(end.from(start));
+    else
+        return start.to(end);
 }
